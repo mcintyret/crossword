@@ -6,14 +6,15 @@ export interface SquareProps {
     isSelected?: boolean;
     onClick(): void;
     onChange(newValue: string): void;
+    onBack(): void;
 }
 
-const ALPHABET = "ABCDEFGHIJKLMNOPQURTUVWXYZ";
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 export class Square extends React.PureComponent<SquareProps, {}> {
     render() {
        const { value, isEditing, isSelected, onClick } = this.props;
-       const className = "square" + (isSelected ? " -selected" : "");
+       const className = "square" + (isSelected ? " -selected" : "") + (isEditing ? " -editing" : "");
        if (!isEditing) {
            return <span className={className} onClick={onClick}>{value}</span>
        }
@@ -24,6 +25,7 @@ export class Square extends React.PureComponent<SquareProps, {}> {
                className={className}
                value={value}
                onChange={this.handleChange}
+               onKeyDown={this.handleKeyDown}
            />
        )
     }
@@ -32,6 +34,16 @@ export class Square extends React.PureComponent<SquareProps, {}> {
         const value = evt.currentTarget.value.toUpperCase();
         if (value === "" || (value.length === 1 && ALPHABET.includes(value))) {
             this.props.onChange(value);
+        }
+        evt.stopPropagation();
+        evt.preventDefault();
+    }
+
+    private handleKeyDown = (evt: React.KeyboardEvent<HTMLInputElement>) => {
+        if (this.props.value === "" && evt.key === "Backspace") {
+            this.props.onBack();
+            evt.stopPropagation();
+            evt.preventDefault();
         }
     }
 }
