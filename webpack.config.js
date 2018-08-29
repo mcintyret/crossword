@@ -23,7 +23,7 @@ const config = {
     },
     output: {
         filename: "bundle.js",
-        path: path.resolve(__dirname, "build/finance"),
+        path: path.resolve(__dirname, "build/crossword"),
         publicPath: '/'
     },
     devtool: IS_PRODUCTION ? false : "source-map",

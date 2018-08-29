@@ -4,17 +4,35 @@ export interface SquareProps {
     value: string;
     isEditing?: boolean;
     isSelected?: boolean;
+    onClick(): void;
     onChange(newValue: string): void;
 }
 
+const ALPHABET = "ABCDEFGHIJKLMNOPQURTUVWXYZ";
+
 export class Square extends React.PureComponent<SquareProps, {}> {
     render() {
-       const { value, isEditing, isSelected } = this.props;
+       const { value, isEditing, isSelected, onClick } = this.props;
        const className = "square" + (isSelected ? " -selected" : "");
        if (!isEditing) {
-           return <span className={className}>{value}</span>
+           return <span className={className} onClick={onClick}>{value}</span>
        }
-       throw new Error("Can't handle editing yet!");
+
+       return (
+           <input
+               autoFocus={true}
+               className={className}
+               value={value}
+               onChange={this.handleChange}
+           />
+       )
+    }
+
+    private handleChange = (evt: React.FormEvent<HTMLInputElement>) => {
+        const value = evt.currentTarget.value.toUpperCase();
+        if (value === "" || (value.length === 1 && ALPHABET.includes(value))) {
+            this.props.onChange(value);
+        }
     }
 }
 

@@ -17,6 +17,22 @@ const crossword: Crossword = {
             startX: 3,
             startY: 4,
             number: 10
+        },
+        {
+            direction: "down",
+            answer: "short",
+            question: "firstClue",
+            startX: 0,
+            startY: 1,
+            number: 2
+        },
+        {
+            direction: "down",
+            answer: "longerr",
+            question: "firstClue",
+            startX: 4,
+            startY: 1,
+            number: 2
         }
     ]
 };
