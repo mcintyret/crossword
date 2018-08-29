@@ -41,6 +41,7 @@ export class Square extends React.PureComponent<SquareProps, {}> {
                 className={className}
                 value={value}
                 onChange={this.handleChange}
+                onClick={this.handleClick}
                 onKeyDown={this.handleKeyDown}
             />
         );

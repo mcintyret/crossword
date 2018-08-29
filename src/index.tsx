@@ -12,7 +12,7 @@ const crossword: Crossword = {
     clues: [
         {
             direction: "across",
-            answer: "firstanswer",
+            answer: "fGrstanswer",
             question: "firstClue",
             startX: 3,
             startY: 4,

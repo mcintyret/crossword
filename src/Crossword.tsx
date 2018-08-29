@@ -10,6 +10,7 @@ export interface CellState {
     props: SquareProps;
     point: Point;
     clues: Clue[];
+    correctValue: string;
 }
 
 export interface Point {
@@ -83,8 +84,12 @@ export class CrosswordPanel extends React.PureComponent<CrosswordPanelProps, Cro
         clues.forEach(clue => {
             for (let col = clue.startX, row = clue.startY, i = 0; i < clue.answer.length; i++, clue.direction === "across" ? col++ : row++) {
                 const number = col === clue.startX && row === clue.startY ? clue.number : undefined;
+                const correctValue = clue.direction === "across" ? clue.answer[col - clue.startX].toUpperCase() : clue.answer[row - clue.startY].toUpperCase();
                 const state = grid[row][col];
                 if (state) {
+                    if (correctValue !== state.correctValue) {
+                        throw new Error(`Invalid crossword! [${col}, ${row}] is both '${correctValue}' and '${state.correctValue}'`);
+                    }
                     state.clues.push(clue);
                 } else {
                     grid[row][col] = {
@@ -101,7 +106,8 @@ export class CrosswordPanel extends React.PureComponent<CrosswordPanelProps, Cro
                             row,
                             col,
                         },
-                        clues: [clue]
+                        clues: [clue],
+                        correctValue
                     }
                 }
             }
@@ -129,7 +135,7 @@ export class CrosswordPanel extends React.PureComponent<CrosswordPanelProps, Cro
         });
     }
 
-    private handleStopEditing = () => this.setState({editingPoint: undefined});
+    private handleStopEditing = () => this.setState({ editingPoint: undefined });
 
     private handleChangeValue = (value: string, col: number, row: number) => {
         const { grid, selectedClue } = this.state;
@@ -192,10 +198,36 @@ export class CrosswordPanel extends React.PureComponent<CrosswordPanelProps, Cro
             ))
         }
         return (
-            <div className="crossword" onClick={this.handleStopEditing}>
-                {rows}
+            <div className="crossword-container">
+                <div className="crossword" onClick={this.handleStopEditing}>
+                    {rows}
+                </div>
+                <div className="controls">
+                    <button
+                        onClick={this.handleRevealAll}
+                    >
+                        Reveal All
+                    </button>
+                </div>
             </div>
-        )
+        );
+    }
+
+    private handleRevealAll = () => {
+        const newGrid = this.state.grid.map(row =>
+            row.map(cell => {
+                if (cell === undefined) {
+                    return undefined;
+                }
+                return {...cell, props: {...cell.props, value: cell.correctValue}}
+            })
+        );
+
+        this.setState({
+            grid: newGrid,
+            editingPoint: undefined,
+            selectedClue: undefined
+        });
     }
 
     private renderCell(cell: CellState | undefined) {
