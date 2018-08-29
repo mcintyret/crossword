@@ -82,6 +82,7 @@ export class CrosswordPanel extends React.PureComponent<CrosswordPanelProps, Cro
 
         clues.forEach(clue => {
             for (let col = clue.startX, row = clue.startY, i = 0; i < clue.answer.length; i++, clue.direction === "across" ? col++ : row++) {
+                const number = col === clue.startX && row === clue.startY ? clue.number : undefined;
                 const state = grid[row][col];
                 if (state) {
                     state.clues.push(clue);
@@ -89,9 +90,12 @@ export class CrosswordPanel extends React.PureComponent<CrosswordPanelProps, Cro
                     grid[row][col] = {
                         props: {
                             value: "",
+                            number,
                             onChange: (value: string) => this.handleChangeValue(value, col, row),
+                            onStopEditing: this.handleStopEditing,
                             onClick: () => this.handleClick(col, row),
-                            onBack: () => this.handleBack(col, row)
+                            onBack: () => this.handleBack(col, row),
+                            onForward: () => this.handleForward(col, row)
                         },
                         point: {
                             row,
@@ -115,6 +119,18 @@ export class CrosswordPanel extends React.PureComponent<CrosswordPanelProps, Cro
         });
     }
 
+    private handleForward = (col: number, row: number) => {
+        const { selectedClue } = this.state;
+        if (selectedClue === undefined) {
+            throw new Error();
+        }
+        this.setState({
+            editingPoint: getNextEditingPoint(selectedClue, row, col)
+        });
+    }
+
+    private handleStopEditing = () => this.setState({editingPoint: undefined});
+
     private handleChangeValue = (value: string, col: number, row: number) => {
         const { grid, selectedClue } = this.state;
         if (selectedClue === undefined) {
@@ -128,8 +144,7 @@ export class CrosswordPanel extends React.PureComponent<CrosswordPanelProps, Cro
         newGrid[row] = newRow;
 
         this.setState({
-            grid: newGrid,
-            editingPoint: value === "" ? { row, col } : getNextEditingPoint(selectedClue, row, col)
+            grid: newGrid
         });
     }
 
@@ -177,7 +192,7 @@ export class CrosswordPanel extends React.PureComponent<CrosswordPanelProps, Cro
             ))
         }
         return (
-            <div className="crossword">
+            <div className="crossword" onClick={this.handleStopEditing}>
                 {rows}
             </div>
         )
